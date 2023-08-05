@@ -104,6 +104,8 @@ def conv_one_file(
     }
 
     out_path = root_path if out_path == Path() else out_path
+    if out_path == root_path:
+        out_path = out_path.parent.joinpath("img_src_out")
     out_path = out_path.joinpath(rel_path)
     out_path.mkdir(exist_ok=True)
     out_path = out_path.joinpath(name).with_suffix(file_conf[ff]["suffix"])
@@ -157,9 +159,9 @@ def parse_args():
         "-cf",
         "-color-format",
         type=str,
-        default="RGB888",
+        default="RGB565ALL",
         choices=["RGB332", "RGB565", "RGB565SWAP", "RGB888", "RGB565ALL"],
-        help="converted color format: RGB332, RGB565, RGB565SWAP, RGB888, RGB565ALL",
+        help="converted color format: RGB332, RGB565, RGB565SWAP, RGB888, RGB565ALL. The default is: RGB565ALL",
     )
     parser.add_argument(
         "-ff",
@@ -167,7 +169,7 @@ def parse_args():
         type=str,
         default="C",
         choices=["C", "BIN"],
-        help="converted file format: C(*.c), BIN(*.bin)",
+        help="converted file format: C(*.c), BIN(*.bin). The default is: C",
     )
     parser.add_argument(
         "-o",
@@ -177,7 +179,7 @@ def parse_args():
         help="output file path. if not set, it will saved in the input dir",
     )
     parser.add_argument(
-        "-r", action="store_const", const=True, help="convert files recursively"
+        "-r", action="store_const", const=True, default=True, help="convert files recursively"
     )
     parser.add_argument("-d", action="store_const", const=True, help="need to dith")
     parser.add_argument(
@@ -197,7 +199,7 @@ class Main(object):
         self.failed_pic_paths = []
 
     def _convert_one(self, root, file):
-        print(f"{self.file_count:<5} {file} START", end="")
+        print(f"{self.file_count:<5} {file} START", end="\n")
         t0 = time.time()
         try:
             conv_rtn = conv_one_file(
