@@ -57,7 +57,8 @@ class _CONST:
     CF_INDEXED_8_BIT = 11
     CF_RAW = 12
     CF_RAW_ALPHA = 13
-    CF_RAW_CHROMA = 12
+    CF_RAW_CHROMA = 14
+    TRUE_COLOR_RGB565_ALL = 15
 
     CF_TRUE_COLOR = 100  # Helper formats is C arrays contains all true color formats (using in "download")
     CF_TRUE_COLOR_ALPHA = 101
@@ -315,12 +316,12 @@ class Converter(object):
             self.FLAG.CF_RAW_CHROMA,
         ):
             tmp_str = "\n  " + ", \n  ".join(
-                ", ".join(tmp_arr[(x_end // 16) * x : (x_end // 16) * x + 16])
+                ", ".join(tmp_arr[(x_end // 16) * x: (x_end // 16) * x + 16])
                 for x in range(x_end // 16)
             )
         else:
             tmp_str = "\n  " + ", \n  ".join(
-                ", ".join(tmp_arr[y * x_end : (y + 1) * x_end]) for y in range(y_end)
+                ", ".join(tmp_arr[y * x_end: (y + 1) * x_end]) for y in range(y_end)
             )
 
         c_array += tmp_str
@@ -340,6 +341,7 @@ class Converter(object):
 #else
 #include "../lvgl/lvgl.h"
 #endif
+
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
@@ -349,6 +351,7 @@ class Converter(object):
 #ifndef {attr_name}
 #define {attr_name}
 #endif
+
 const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST {attr_name} uint8_t {self.out_name}_map[] = {{"""
         return c_header
 

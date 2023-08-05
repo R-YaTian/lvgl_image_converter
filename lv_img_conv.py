@@ -43,6 +43,7 @@ name2const = {
     "true_color": Converter.FLAG.CF_TRUE_COLOR,
     "true_color_alpha": Converter.FLAG.CF_TRUE_COLOR_ALPHA,
     "true_color_chroma": Converter.FLAG.CF_TRUE_COLOR_CHROMA,
+    "RGB565ALL": Converter.FLAG.TRUE_COLOR_RGB565_ALL,
 }
 
 
@@ -60,6 +61,14 @@ def check_allowed(filepath: Path):
     ]
 
 
+def get_color_mode(filepath: Path):
+    suffix: str = filepath.suffix
+    if suffix.lower() in [".jpg", ".jpeg", ".bmp", ".gif"]:
+        return "true_color"
+    elif suffix.lower() in [".png", ".tif", ".tga"]:
+        return "true_color_alpha"
+
+
 def conv_one_file(
     root: Path, filepath: Path, f, cf, ff: str, dither, bgr_mode, out_path=Path()
 ):
@@ -68,14 +77,24 @@ def conv_one_file(
     if len(root_path.parts) > 0:
         rel_path = root_path.relative_to(root)
     name = filepath.stem
+    if f == "auto":
+        f = get_color_mode(filepath)
     conv = Converter(
         filepath.as_posix(), name, dither, name2const[f], cf_palette_bgr_en=bgr_mode
     )
 
     c_arr = ""
     if f in ["true_color", "true_color_alpha", "true_color_chroma"]:
-        conv.convert(name2const[cf], 0 if f == "true_color" else 1)
-        c_arr = conv.format_to_c_array()
+        if cf == "RGB565ALL":
+            cf1 = "RGB565"
+            conv.convert(name2const[cf1], 0 if f == "true_color" else 1)
+            c_arr = conv.format_to_c_array()
+            cf2 = "RGB565SWAP"
+            conv.convert(name2const[cf2], 0 if f == "true_color" else 1)
+            c_arr1 = conv.format_to_c_array()
+        else:
+            conv.convert(name2const[cf], 0 if f == "true_color" else 1)
+            c_arr = conv.format_to_c_array()
     else:
         conv.convert(name2const[f])
 
@@ -91,7 +110,7 @@ def conv_one_file(
 
     with open(out_path, file_conf[ff]["mode"]) as fi:
         res = (
-            conv.get_c_code_file(name2const[f], c_arr)
+            conv.get_c_code_file(name2const[f], c_arr if cf != "RGB565ALL" else c_arr1 + c_arr)
             if ff == "C"
             else conv.get_bin_file(name2const[f])
         )
@@ -111,7 +130,7 @@ def parse_args():
         "-f",
         "-format",
         type=str,
-        default="true_color",
+        default="auto",
         choices=[
             "true_color",
             "true_color_alpha",
@@ -132,15 +151,15 @@ def parse_args():
         "true_color, true_color_alpha, true_color_chroma, "
         "indexed_1, indexed_2, indexed_4, indexed_8, "
         "alpha_1, alpha_2, alpha_4, alpha_8, "
-        "raw, raw_alpha, raw_chroma. The default is: true_color",
+        "raw, raw_alpha, raw_chroma. The default is: auto",
     )
     parser.add_argument(
         "-cf",
         "-color-format",
         type=str,
         default="RGB888",
-        choices=["RGB332", "RGB565", "RGB565SWAP", "RGB888"],
-        help="converted color format: RGB332, RGB565, RGB565SWAP, RGB888",
+        choices=["RGB332", "RGB565", "RGB565SWAP", "RGB888", "RGB565ALL"],
+        help="converted color format: RGB332, RGB565, RGB565SWAP, RGB888, RGB565ALL",
     )
     parser.add_argument(
         "-ff",
