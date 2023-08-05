@@ -73,9 +73,6 @@ def conv_one_file(
     root: Path, filepath: Path, f, cf, ff: str, dither, bgr_mode, out_path=Path()
 ):
     root_path = filepath.parent
-    rel_path = Path()
-    if len(root_path.parts) > 0:
-        rel_path = root_path.relative_to(root)
     name = filepath.stem
     if f == "auto":
         f = get_color_mode(filepath)
@@ -106,7 +103,6 @@ def conv_one_file(
     out_path = root_path if out_path == Path() else out_path
     if out_path == root_path:
         out_path = out_path.parent.joinpath("img_src_out")
-    out_path = out_path.joinpath(rel_path)
     out_path.mkdir(exist_ok=True)
     out_path = out_path.joinpath(name).with_suffix(file_conf[ff]["suffix"])
 
