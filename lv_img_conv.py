@@ -238,6 +238,14 @@ class Main(object):
             print(*self.failed_pic_paths, sep="\n")
 
 
+def run_conv(wpath):
+    import sys
+    sys.argv.append('')
+    main = Main(parse_args())
+    main.args.filepath = [wpath]
+    main.convert()
+
+
 if __name__ == "__main__":
     main = Main(parse_args())
     main.convert()
