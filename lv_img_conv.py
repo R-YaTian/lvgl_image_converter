@@ -155,9 +155,9 @@ def parse_args():
         "-cf",
         "-color-format",
         type=str,
-        default="RGB565ALL",
+        default="RGB565SWAP",
         choices=["RGB332", "RGB565", "RGB565SWAP", "RGB888", "RGB565ALL"],
-        help="converted color format: RGB332, RGB565, RGB565SWAP, RGB888, RGB565ALL. The default is: RGB565ALL",
+        help="converted color format: RGB332, RGB565, RGB565SWAP, RGB888, RGB565ALL. The default is: RGB565SWAP",
     )
     parser.add_argument(
         "-ff",
