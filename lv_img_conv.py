@@ -12,6 +12,7 @@
 
 import argparse
 import time
+import os
 from pathlib import Path
 
 try:
@@ -63,7 +64,10 @@ def check_allowed(filepath: Path):
 
 def get_color_mode(filepath: Path):
     suffix: str = filepath.suffix
-    if suffix.lower() in [".jpg", ".jpeg", ".bmp", ".gif"]:
+    basename: str = os.path.basename(filepath)
+    if basename.find('clock_hand') != -1:
+        return "true_color_chroma"
+    elif suffix.lower() in [".jpg", ".jpeg", ".bmp", ".gif"]:
         return "true_color"
     elif suffix.lower() in [".png", ".tif", ".tga"]:
         return "true_color_alpha"
@@ -163,9 +167,9 @@ def parse_args():
         "-ff",
         "-file-format",
         type=str,
-        default="C",
+        default="BIN",
         choices=["C", "BIN"],
-        help="converted file format: C(*.c), BIN(*.bin). The default is: C",
+        help="converted file format: C(*.c), BIN(*.bin). The default is: BIN",
     )
     parser.add_argument(
         "-o",
