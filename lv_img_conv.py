@@ -106,7 +106,7 @@ def conv_one_file(
 
     out_path = root_path if out_path == Path() else out_path
     if out_path == root_path:
-        out_path = out_path.parent.joinpath("img_src_out")
+        out_path = out_path.parent.joinpath("img_bin_out")
     out_path.mkdir(exist_ok=True)
     out_path = out_path.joinpath(name).with_suffix(file_conf[ff]["suffix"])
 
