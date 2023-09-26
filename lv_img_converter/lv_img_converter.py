@@ -58,7 +58,6 @@ class _CONST:
     CF_RAW = 12
     CF_RAW_ALPHA = 13
     CF_RAW_CHROMA = 12
-    TRUE_COLOR_RGB565_ALL = 15
 
     CF_TRUE_COLOR = 100  # Helper formats is C arrays contains all true color formats (using in "download")
     CF_TRUE_COLOR_ALPHA = 101

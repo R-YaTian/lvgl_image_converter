@@ -44,7 +44,6 @@ name2const = {
     "true_color": Converter.FLAG.CF_TRUE_COLOR,
     "true_color_alpha": Converter.FLAG.CF_TRUE_COLOR_ALPHA,
     "true_color_chroma": Converter.FLAG.CF_TRUE_COLOR_CHROMA,
-    "RGB565ALL": Converter.FLAG.TRUE_COLOR_RGB565_ALL,
 }
 
 
