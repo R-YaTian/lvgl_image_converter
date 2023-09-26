@@ -10,9 +10,9 @@
 ##############################################################
 
 
-import math
 import struct
 from typing import *
+from decimal import Decimal, ROUND_HALF_DOWN
 
 from PIL import Image
 
@@ -57,7 +57,7 @@ class _CONST:
     CF_INDEXED_8_BIT = 11
     CF_RAW = 12
     CF_RAW_ALPHA = 13
-    CF_RAW_CHROMA = 14
+    CF_RAW_CHROMA = 12
     TRUE_COLOR_RGB565_ALL = 15
 
     CF_TRUE_COLOR = 100  # Helper formats is C arrays contains all true color formats (using in "download")
@@ -424,7 +424,17 @@ const lv_img_dsc_t {self.out_name} = {{
         if self.img.mode == "P":
             c = get_color_from_palette(self.img.getpalette(), c)
 
-        a = c[3] if len(c) == 4 else 0xFF
+        if self.alpha:
+            if len(c) == 4:
+                a = (c[3] << 1)
+                if a & 2:
+                    a |= 1
+                a = 255 - a
+            else:
+                a = 0xFF
+        else:
+            a = 0xFF
+
         r, g, b = c[:3]
         cx = self.img.getpixel((x, y))
         self._dither_next(r, g, b, x)
@@ -637,5 +647,5 @@ const lv_img_dsc_t {self.out_name} = {{
     @staticmethod
     def _classify_pixel(value, bits):
         tmp = 1 << (8 - bits)
-        val = math.ceil(value / tmp) * tmp
+        val = int(Decimal(str(value / tmp)).quantize(Decimal('0'), rounding=ROUND_HALF_DOWN)) * tmp
         return val if val >= 0 else 0

@@ -65,9 +65,10 @@ def check_allowed(filepath: Path):
 def get_color_mode(filepath: Path):
     suffix: str = filepath.suffix
     basename: str = os.path.basename(filepath)
-    if basename.find('clock_hand') != -1:
+    if ((basename.find('point') != -1 or suffix.lower() == ".bmp")
+            and basename.find('bg') == -1 and basename.find('preview') == -1):
         return "true_color_chroma"
-    elif suffix.lower() in [".jpg", ".jpeg", ".bmp", ".gif"]:
+    elif basename.find('bg') != -1 or basename.find('preview') != -1 or suffix.lower() in [".jpg", ".jpeg", ".gif"]:
         return "true_color"
     elif suffix.lower() in [".png", ".tif", ".tga"]:
         return "true_color_alpha"
@@ -88,13 +89,13 @@ def conv_one_file(
     if f in ["true_color", "true_color_alpha", "true_color_chroma"]:
         if cf == "RGB565ALL":
             cf1 = "RGB565"
-            conv.convert(name2const[cf1], 0 if f == "true_color" else 1)
+            conv.convert(name2const[cf1], 1 if f == "true_color_alpha" else 0)
             c_arr = conv.format_to_c_array()
             cf2 = "RGB565SWAP"
-            conv.convert(name2const[cf2], 0 if f == "true_color" else 1)
+            conv.convert(name2const[cf2], 1 if f == "true_color_alpha" else 0)
             c_arr1 = conv.format_to_c_array()
         else:
-            conv.convert(name2const[cf], 0 if f == "true_color" else 1)
+            conv.convert(name2const[cf], 1 if f == "true_color_alpha" else 0)
             c_arr = conv.format_to_c_array()
     else:
         conv.convert(name2const[f])
